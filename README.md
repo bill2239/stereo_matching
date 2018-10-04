@@ -4,9 +4,9 @@ stereo matching
 Simple CPU implementation of Block Matching using simple Sum of Square difference Matching Cost.
 
 left image:  
-![image](im1.png)
+![image](im1.png)  
 right image:  
-![image](im2.png)
+![image](im2.png)  
 disparity image:  
 ![image](depth.png)
 ---
