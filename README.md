@@ -1,6 +1,5 @@
 stereo matching 
 ==========
-
 Simple CPU implementation from sratch of Block Matching using simple Sum of Square difference Matching Cost  
 left image:  
 ![image](im1.png)  
