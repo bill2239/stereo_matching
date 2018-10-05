@@ -40,7 +40,6 @@ Mat stereo_match(Mat left,Mat right,int window_size,int max_disparity) {
 
 	}
 
-	imwrite("dis.png",imgDisparity8U);
 	return imgDisparity8U;
 }
 
