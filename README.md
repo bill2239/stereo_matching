@@ -1,7 +1,7 @@
 stereo matching 
 ==========
 Simple CPU implementation from sratch of Block Matching using simple Sum of Square difference Matching Cost 
- 
+You can either compile the code with gcc or visual studio with Opencv installed   
 left image:  
 ![image](im1.png)  
 right image:  
