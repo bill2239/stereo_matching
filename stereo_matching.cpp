@@ -33,8 +33,8 @@ Mat stereo_match(Mat left,Mat right,int window_size,int max_disparity) {
 						best_dis = off;
 					}
 				}
-				imgDisparity8U.at<uchar>(y, x) = best_dis * adjust;
 			}
+			imgDisparity8U.at<uchar>(y, x) = best_dis * adjust;
 		
 		}
 
