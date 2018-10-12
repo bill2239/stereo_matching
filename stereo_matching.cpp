@@ -49,6 +49,7 @@ Mat stereo_match_parallel(Mat left, Mat right, int window_size, int max_disparit
 	Mat imgDisparity8U = Mat(left.rows, left.cols, CV_8U);
 	float window_half = window_size / 2;
 	int adjust = 255 / max_disparity;
+	// parallel computation with lambda expression (c++11 or later)
 	parallel_for_(Range(0, w*h), [&](const Range& range) {
 		for (int r = range.start; r < range.end; r++) {
 			float x = r / h + window_half;
