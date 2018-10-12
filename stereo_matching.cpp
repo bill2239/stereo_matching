@@ -26,12 +26,12 @@ Mat stereo_match(Mat left,Mat right,int window_size,int max_disparity) {
 					for (int u = -window_half; u < window_half; u++) {
 						ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
 						ssd += ssd_tmp * ssd_tmp;
-					}
-					// store the best disparity (with smallest ssd)
-					if (ssd < prev_ssd) {
+					}	
+				}
+				// store the best disparity (with smallest ssd)
+				if (ssd < prev_ssd) {
 						prev_ssd = ssd;
 						best_dis = off;
-					}
 				}
 			}
 			imgDisparity8U.at<uchar>(y, x) = best_dis * adjust;
@@ -68,10 +68,10 @@ Mat stereo_match_parallel(Mat left, Mat right, int window_size, int max_disparit
 							ssd_tmp = left.at<uchar>(static_cast<int>(y) + v, static_cast<int>(x) + u) - right.at<uchar>(static_cast<int>(y) + v, static_cast<int>(x) + u - off);
 							ssd += ssd_tmp * ssd_tmp;
 						}
-						if (ssd < prev_ssd) {
+					}
+					if (ssd < prev_ssd) {
 							prev_ssd = ssd;
 							best_dis = off;
-						}
 					}
 
 
