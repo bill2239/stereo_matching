@@ -1,6 +1,6 @@
 stereo matching 
 ==========
-Simple CPU implementation from sratch of Block Matching using simple Sum of Square difference Matching Cost.  
+Simple CPU implementation from sratch of Block Matching using simple Sum of Square difference Matching Cost. Also have the option for parallel computing  
 You can either compile the code with gcc or visual studio with Opencv installed   
 
 left image:  
@@ -16,10 +16,10 @@ disparity image:
 
 **Usage**
 
-    ./stereo_mathing -left=<left image> -right=<right image> -max-disparity=<disparity range> -output=<output image file> 
+    ./stereo_mathing -left=<left image> -right=<right image> -max-disparity=<disparity range> -output=<output image file> -parallel=<if you want to run parallel version>
 
 **Examples**
 
-    ./stereo_matching -left=im1.png -right=im2.png -max-disparity=50 -output=depth.png 
+    ./stereo_matching -left=im1.png -right=im2.png -max-disparity=50 -output=depth.png -parallel=no
 
 
