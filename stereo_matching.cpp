@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 	string parallel = parser.get<std::string>("parallel");
 	int max_disparity = parser.get<int>("max-disparity");
 
-	Mat dis
+	Mat dis;
 	Mat left = imread(leftname,0); //read images into grayscale
 	Mat right = imread(rightname,0);
 	if (parallel == "no"){
