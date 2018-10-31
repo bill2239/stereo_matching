@@ -14,7 +14,7 @@ disparity image with rank transform:
 disparity image with census transform:  
 ![image](depth_census.png)  
 
-Clearly, using rank transform or census transform looks better, probably the nature of these transform make left and right images less sensitive to illumination changes.  
+Clearly, choosing rank transform or census transform as matching cost make disparity map less noisy, probably the nature of these transform make left and right images less sensitive to illumination changes.  
 
 ---
 ## Reqirement 
