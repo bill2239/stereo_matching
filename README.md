@@ -8,9 +8,9 @@ left image:
 right image:  
 ![image](im2.png)  
 disparity image with fixed windows ssd:  
-![image](depth.png)
+![image](depth.png)  
 disparity image with rank transform:  
-![image](depth_rank.png)
+![image](depth_rank.png)  
 disparity image with census transform:  
 ![image](depth_census.png)  
 
