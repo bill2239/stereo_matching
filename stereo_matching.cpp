@@ -72,30 +72,32 @@ Mat stereo_match(Mat left,Mat right,int window_size,int max_disparity,string cos
 		left = census_transform(left, 7);
 		right = census_transform(right, 7);
 	}
-	for (int y = window_half; y < h - window_half; y++) {
-		for (int x = window_half; x < w - window_half; x++) {
-			int prev_ssd = INT_MAX;
-			int best_dis = 0;
-			for (int off = 0; off < max_disparity; off++) {
-				int ssd = 0;
-				int ssd_tmp = 0;
-				for (int v = -window_half; v < window_half; v++) {
-					for (int u = -window_half; u < window_half; u++) {
-						ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
-						ssd += ssd_tmp * ssd_tmp;
+	#pragma omp parallel for
+		for (int y = window_half; y < h - window_half; y++) {
+			for (int x = window_half; x < w - window_half; x++) {
+				int prev_ssd = INT_MAX;
+				int best_dis = 0;
+				for (int off = 0; off < max_disparity; off++) {
+					int ssd = 0;
+					int ssd_tmp = 0;
+					for (int v = -window_half; v < window_half; v++) {
+						for (int u = -window_half; u < window_half; u++) {
+							ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
+							ssd += ssd_tmp * ssd_tmp;
+						}
+						
+					}
+					if (ssd < prev_ssd) {
+						prev_ssd = ssd;
+						best_dis = off;
 					}
 					
 				}
-				if (ssd < prev_ssd) {
-					prev_ssd = ssd;
-					best_dis = off;
-				}
-				
+				imgDisparity8U.at<uchar>(y, x) = best_dis * adjust;
 			}
-			imgDisparity8U.at<uchar>(y, x) = best_dis * adjust;
 		}
-	}
 
+	
 	return imgDisparity8U;
 }
 
