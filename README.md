@@ -1,6 +1,6 @@
 stereo matching 
 ==========
-Simple CPU implementation from sratch of Block Matching using simple Sum of Square difference, rank transform and census transform as matching cost. Defualt use OpenMP optimization, also have the option to use OpenCV parallel computing  
+Simple CPU implementation from sratch of Block Matching using simple Sum of Square difference, rank transform and census transform as matching cost. Defualt use OpenMP optimization (save about 200ms per image), also have the option to use OpenCV parallel computing (but didn't improve execution time)  
 You can either compile the code to executable with gcc or visual studio with Opencv installed. This have been tested in Windows 10.    
 
 left image:  
