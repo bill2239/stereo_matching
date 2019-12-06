@@ -1,4 +1,4 @@
-
+#include <ppl.h>
 #include "ssd_stereo.h"
 
 Mat Stereo::rank_transform(Mat image, int windowsize) {
@@ -66,7 +66,7 @@ Mat Stereo::stereo_match(Mat left, Mat right) {
 		right = Stereo::census_transform(right, tran_win_size_);
 	}
 	if (parallel_) {
-#pragma omp parallel for
+#pragma omp parallel for 
 		for (int y = window_half; y < h - window_half; y++) {
 			uchar *imgDisparity_y = imgDisparity8U.ptr(y);
 			for (int x = window_half; x < w - window_half; x++) {
@@ -132,72 +132,60 @@ Mat Stereo::stereo_match(Mat left, Mat right) {
 }
 
 
-//opencv implementation of parallel execution, but didn't work well
+//vc++ concurrency implementation of parallel execution, but slower than openMP
 //
-//Mat stereo_match_parallel(Mat left, Mat right, int window_size, int max_disparity) {
-//	int h = left.rows;
-//	int w = left.cols;
-//	Mat imgDisparity8U = Mat(left.rows, left.cols, CV_8U);
-//	float window_half = window_size / 2;
-//	int adjust = 255 / max_disparity;
-//	parallel_for_(Range(0, w*h), [&](const Range& range) {
-//		for (int r = range.start; r < range.end; r++) {
-//			float x = r / h + window_half;
-//			float y = r % h + window_half;
-//			if (x < w - window_half && y < h - window_half) {
-//				//cout << r << endl;
-//				//system("pause");
-//
-//				int prev_ssd = INT_MAX;
-//				int best_dis = 0;
-//				for (int off = 0; off < max_disparity; off++) {
-//					int ssd = 0;
-//					int ssd_tmp = 0;
-//					for (int v = -window_half; v < window_half; v++) {
-//						//uchar *leftdata = left.ptr<uchar>(static_cast<int>(y) + v);
-//						//uchar *rightdata = right.ptr<uchar>(static_cast<int>(y) + v);
-//						for (int u = -window_half; u < window_half; u++) {
-//
-//
-//
-//							ssd_tmp = left.at<uchar>(static_cast<int>(y) + v, static_cast<int>(x) + u) - right.at<uchar>(static_cast<int>(y) + v, static_cast<int>(x) + u - off);
-//							//ssd_tmp = leftdata[static_cast<int>(x) + u] - rightdata[static_cast<int>(x) + u - off]; 
-//							ssd += ssd_tmp * ssd_tmp;
-//						}
-//						
-//					}
-//					if (ssd < prev_ssd) {
-//						prev_ssd = ssd;
-//						best_dis = off;
-//					}
-//
-//
-//				}
-//
-//				/*cout << x << endl;
-//				cout << y << endl;
-//				cout << best_dis * adjust << endl;*/
-//				imgDisparity8U.at<uchar>(static_cast<int>(y), static_cast<int>(x)) = best_dis * adjust;
-//				//system("pause");
-//			}
-//			else continue;
-//		}
-//	});
-//	//cout << "finished computing " << endl;
-//	imwrite("dis.png", imgDisparity8U);
-//	return imgDisparity8U;
-//}
+Mat Stereo::stereo_match_parallel(Mat left, Mat right) {
+	int h = left.rows;
+	int w = left.cols;
+	Mat imgDisparity8U = Mat(left.rows, left.cols, CV_8U);
+	float window_half = win_size_ / 2;
+	int adjust = 255 / max_disparity_;
+	//for (int y = window_half; y < h - window_half; y++) {
+	//using namespace concurrency;
+	concurrency::parallel_for (size_t(window_half), size_t(h - window_half),[&](size_t y){
+		uchar *imgDisparity_y = imgDisparity8U.ptr(y);
+		for (int x = window_half; x < w - window_half; x++) {
+			int prev_ssd = INT_MAX;
+			int best_dis = 0;
+			for (int off = 0; off < max_disparity_; off++) {
+				int ssd = 0;
+				int ssd_tmp = 0;
+				for (int v = -window_half; v < window_half; v++) {
+
+					for (int u = -window_half; u < window_half; u++) {
+
+						ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
+						ssd += ssd_tmp * ssd_tmp;
+					}
+
+				}
+				if (ssd < prev_ssd) {
+					prev_ssd = ssd;
+					best_dis = off;
+				}
+
+
+			}
+
+			imgDisparity_y[x] = best_dis * adjust;
+		}
+	});
+	//cout << "finished computing " << endl;
+	//imwrite("dis.png", imgDisparity8U);
+	return imgDisparity8U;
+}
 
 
 
 int main(int argc, char** argv)
 {
 	cv::CommandLineParser parser(argc, argv,
-		"{left||}{right||}{max-disparity|0|}{window_size|0|}{tranwin_size|0|}{output||}{parallel||}{cost||}");
+		"{left||}{right||}{max-disparity|0|}{window_size|0|}{tranwin_size|0|}{output||}{parallel||}{cost||}{windows||}");
 	string leftname = parser.get<std::string>("left");
 	string rightname = parser.get<std::string>("right");
 	string outname = parser.get<std::string>("output");
 	string parallel = parser.get<std::string>("parallel");
+	string windows = parser.get<std::string>("windows");
 	string cost = parser.get<std::string>("cost");
 	int max_disparity = parser.get<int>("max-disparity");
 	int window_size = parser.get<int>("window_size");
@@ -213,14 +201,19 @@ int main(int argc, char** argv)
 	}
 	else {
 		Stereo s(window_size, max_disparity, tranwin_size, cost, true);
-		dis = s.stereo_match(left, right);
+		if (windows == "yes") {
+			dis = s.stereo_match_parallel(left, right);
+		}
+		else {
+			dis = s.stereo_match(left, right);
+		}
 	}
 
 
 
 	t2 = getTickCount() - t2;
 	printf("census Time elapsed: %fms\n", t2 * 1000 / getTickFrequency());
-	imwrite(outname, dis);
+	cv::imwrite(outname, dis);
 
 	//system("pause");
 	return 0;
