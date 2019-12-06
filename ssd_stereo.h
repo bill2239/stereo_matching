@@ -1,4 +1,3 @@
-#pragma once
 #include "opencv2/core/utility.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgcodecs.hpp"
@@ -26,5 +25,6 @@ public:
 	Mat rank_transform(Mat image, int tran_size);
 	Mat census_transform(Mat image, int tran_size);
 	Mat stereo_match(Mat left, Mat right);
+	Mat stereo_match_parallel(Mat left, Mat right);
 	
 };
