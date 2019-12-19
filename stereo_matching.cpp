@@ -7,14 +7,14 @@ Mat Stereo::rank_transform(Mat image, int windowsize) {
 	Mat imgDisparity8U = Mat(image.rows, image.cols, CV_8U);
 	int window_half = windowsize / 2;
 
-	for (int y = window_half; y < h - window_half; y++) {
-		for (int x = window_half; x < w - window_half; x++) {
+	for (int y = window_half; y < h - window_half; ++y) {
+		for (int x = window_half; x < w - window_half; ++x) {
 			int ssd = 0;
 
-			for (int v = -window_half; v < window_half + 1; v++) {
-				for (int u = -window_half; u < window_half + 1; u++) {
+			for (int v = -window_half; v < window_half + 1; ++v) {
+				for (int u = -window_half; u < window_half + 1; ++u) {
 
-					if (image.at<uchar>(y + v, x + u) > image.at<uchar>(y, x)) ssd++;
+					if (image.at<uchar>(y + v, x + u) > image.at<uchar>(y, x)) ++ssd;
 				}
 
 			}
@@ -31,15 +31,16 @@ Mat Stereo::census_transform(Mat image, int windowsize) {
 	Mat imgDisparity8U = Mat(image.rows, image.cols, CV_8U);
 	int window_half = windowsize / 2;
 
-	for (int y = window_half; y < h - window_half; y++) {
-		for (int x = window_half; x < w - window_half; x++) {
+	for (int y = window_half; y < h - window_half; ++y) {
+		for (int x = window_half; x < w - window_half; ++x) {
 			int ssd = 0;
 
-			for (int v = -window_half; v < window_half + 1; v++) {
-				for (int u = -window_half; u < window_half + 1; u++) {
-					ssd <<= 1;
-					if (image.at<uchar>(y + v, x + u) > image.at<uchar>(y, x)) ssd = ssd | 1;
-					else  ssd = ssd | 0;
+			for (int v = -window_half; v < window_half + 1; ++v) {
+				for (int u = -window_half; u < window_half + 1; ++u) {
+					if (v != 0 && u != 0) { // skip the central pixel
+						ssd <<= 1;
+						if (image.at<uchar>(y + v, x + u) > image.at<uchar>(y, x))  ssd = ssd + 1; // assign last digit to 1 if pixel is larger than central pixel in the windows else assign 0
+					}
 				}
 
 			}
@@ -67,17 +68,17 @@ Mat Stereo::stereo_match(Mat left, Mat right) {
 	}
 	if (parallel_) {
 #pragma omp parallel for 
-		for (int y = window_half; y < h - window_half; y++) {
+		for (int y = window_half; y < h - window_half; ++y) {
 			uchar *imgDisparity_y = imgDisparity8U.ptr(y);
-			for (int x = window_half; x < w - window_half; x++) {
+			for (int x = window_half; x < w - window_half; ++x) {
 				int prev_ssd = INT_MAX;
 				int best_dis = 0;
-				for (int off = 0; off < max_disparity_; off++) {
+				for (int off = 0; off < max_disparity_; ++off) {
 					int ssd = 0;
 					int ssd_tmp = 0;
-					for (int v = -window_half; v < window_half; v++) {
+					for (int v = -window_half; v < window_half; ++v) {
 
-						for (int u = -window_half; u < window_half; u++) {
+						for (int u = -window_half; u < window_half; ++u) {
 
 							ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
 							ssd += ssd_tmp * ssd_tmp;
@@ -97,17 +98,17 @@ Mat Stereo::stereo_match(Mat left, Mat right) {
 		}
 	}
 	else {
-		for (int y = window_half; y < h - window_half; y++) {
+		for (int y = window_half; y < h - window_half; ++y) {
 			uchar *imgDisparity_y = imgDisparity8U.ptr(y);
-			for (int x = window_half; x < w - window_half; x++) {
+			for (int x = window_half; x < w - window_half; ++x) {
 				int prev_ssd = INT_MAX;
 				int best_dis = 0;
-				for (int off = 0; off < max_disparity_; off++) {
+				for (int off = 0; off < max_disparity_; ++off) {
 					int ssd = 0;
 					int ssd_tmp = 0;
-					for (int v = -window_half; v < window_half; v++) {
+					for (int v = -window_half; v < window_half; ++v) {
 
-						for (int u = -window_half; u < window_half; u++) {
+						for (int u = -window_half; u < window_half; ++u) {
 
 							ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
 							ssd += ssd_tmp * ssd_tmp;
