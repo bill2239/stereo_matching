@@ -1,6 +1,6 @@
 stereo matching 
 ==========
-Simple CPU implementation from sratch of Block Matching using simple Sum of Square difference, rank transform and census transform as matching cost. Defualt use OpenMP optimization (save about 200ms per image), also have the option to use Visual c++ (for windows user) concurrency module to parallel the code (slower than openMP in my case)   
+Simple CPU implementation from scratch of Block Matching using simple Sum of Square difference, rank transform and census transform as matching cost. Defualt use OpenMP optimization (save about 200ms per image), also have the option to use Visual c++ (for windows user) concurrency module to parallel the code (slower than openMP in my case)   
 You can either compile the code to executable with gcc or visual studio with Opencv installed. This have been tested in Windows 10.    
 
 left image:  
@@ -14,7 +14,7 @@ disparity image with rank transform:
 disparity image with census transform:  
 ![image](depth_census.png)  
 
-Clearly, choosing rank transform or census transform as matching cost make disparity map less noisy, probably the nature of these transform make left and right images less sensitive to illumination changes.  
+Clearly, choosing rank transform or census transform as matching cost make disparity map less noisy, probably the nature of these transform make left and right images less sensitive to illumination changes. p.s. using census transform is slower than using rank transform  
 
 ---
 ## Reqirement 
