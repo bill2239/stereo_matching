@@ -7,6 +7,7 @@
 	// use __popcnt (windows) built-in function to count the number of 1 in integer 
 	static inline int HammingDistance(int a, int b) { return static_cast<int>(__popcnt(a ^ b)); }
 #else
+// to calculate metric for census transform
 int HammingDistance(const int& a, const int& b) {
 	int d = a ^ b;
 	int res = 0;
@@ -17,7 +18,7 @@ int HammingDistance(const int& a, const int& b) {
 	return res;
 }
 #endif
-// to calculate metric for census transform
+
 
 
 Mat Stereo::rank_transform(Mat image, int windowsize) {
