@@ -1,6 +1,25 @@
 #include <ppl.h>
 #include "ssd_stereo.h"
 
+
+
+#ifdef _WIN64 || _WIN32
+	// use __popcnt (windows) built-in function to count the number of 1 in integer 
+	static inline int HammingDistance(int a, int b) { return static_cast<int>(__popcnt(a ^ b)); }
+#else
+int HammingDistance(const int& a, const int& b) {
+	int d = a ^ b;
+	int res = 0;
+	while (d > 0) {
+		res += d & 1;
+		d >>= 1;
+	}
+	return res;
+}
+#endif
+// to calculate metric for census transform
+
+
 Mat Stereo::rank_transform(Mat image, int windowsize) {
 	int h = image.rows;
 	int w = image.cols;
@@ -79,8 +98,14 @@ Mat Stereo::stereo_match(Mat left, Mat right) {
 					for (int v = -window_half; v < window_half; ++v) {
 
 						for (int u = -window_half; u < window_half; ++u) {
+							if (cost_ == "census") {
 
-							ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
+								ssd_tmp = HammingDistance(left.at<uchar>(y + v, x + u), right.at<uchar>(y + v, x + u - off));
+								//ssd_tmp = hamming_distance(left.at<uchar>(y + v, x + u), right.at<uchar>(y + v, x + u - off));
+							}
+							else {
+								ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
+							}
 							ssd += ssd_tmp * ssd_tmp;
 						}
 
@@ -110,7 +135,12 @@ Mat Stereo::stereo_match(Mat left, Mat right) {
 
 						for (int u = -window_half; u < window_half; ++u) {
 
-							ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
+							if (cost_ == "census") {
+								ssd_tmp = HammingDistance(left.at<uchar>(y + v, x + u), right.at<uchar>(y + v, x + u - off));
+							}
+							else {
+								ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
+							}
 							ssd += ssd_tmp * ssd_tmp;
 						}
 
@@ -133,7 +163,7 @@ Mat Stereo::stereo_match(Mat left, Mat right) {
 }
 
 
-//vc++ concurrency implementation of parallel execution, but slower than openMP
+//vc++ concurrency implementation of parallel execution, but slower than openMP, not good for census
 //
 Mat Stereo::stereo_match_parallel(Mat left, Mat right) {
 	int h = left.rows;
@@ -155,7 +185,12 @@ Mat Stereo::stereo_match_parallel(Mat left, Mat right) {
 
 					for (int u = -window_half; u < window_half; u++) {
 
-						ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
+						if (cost_ == "census") {
+							ssd_tmp = HammingDistance(left.at<uchar>(y + v, x + u), right.at<uchar>(y + v, x + u - off));
+						}
+						else {
+							ssd_tmp = left.at<uchar>(y + v, x + u) - right.at<uchar>(y + v, x + u - off);
+						}
 						ssd += ssd_tmp * ssd_tmp;
 					}
 

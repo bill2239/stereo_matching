@@ -15,9 +15,9 @@ private:
 public:
 	
 	Stereo(int window_size, int max_dis, int tran_size,string cost, bool parallel) {
-		win_size_ = window_size;
+		win_size_ = window_size;  // block size 
 		max_disparity_ = max_dis;
-		tran_win_size_ = tran_size;
+		tran_win_size_ = tran_size; // matching cost windows size
 		cost_ = cost;
 		parallel_ = parallel;
 	}
