@@ -1,7 +1,7 @@
 stereo matching 
 ==========
 Simple CPU implementation from scratch of Block Matching using simple Sum of Square difference, rank transform and census transform as matching cost. Defualt use OpenMP optimization (save about 200ms per image), also have the option to use Visual c++ (for windows user) concurrency module to parallel the code (slower than openMP in my case)   
-You can either compile the code to executable with gcc or visual studio with Opencv installed. This have been tested in Windows 10.    
+You can either compile the code to executable with gcc or visual studio with Opencv installed. This have been tested in Windows 10 and ubuntu 20.04    
 
 left image:  
 ![image](im1.png)  
@@ -20,6 +20,10 @@ Clearly, choosing rank transform or census transform as matching cost make dispa
 ## Reqirement 
 
     $OPENCV
+
+**Compile**
+
+    bash ./build 
 
 **Usage**
 
