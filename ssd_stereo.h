@@ -25,6 +25,8 @@ public:
 	Mat rank_transform(Mat image, int tran_size);
 	Mat census_transform(Mat image, int tran_size);
 	Mat stereo_match(Mat left, Mat right);
+	#if defined(_WIN32) || defined(_WIN64)
 	Mat stereo_match_parallel(Mat left, Mat right);
+	#endif
 	
 };

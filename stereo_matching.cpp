@@ -1,23 +1,28 @@
-#include <ppl.h>
+
 #include "ssd_stereo.h"
 
 
 
-#ifdef _WIN64 || _WIN32
-	// use __popcnt (windows) built-in function to count the number of 1 in integer 
-	static inline int HammingDistance(int a, int b) { return static_cast<int>(__popcnt(a ^ b)); }
+#if defined(_WIN32) || defined(_WIN64)
+    #include <intrin.h>
+    static inline int HammingDistance(int a, int b) { return __popcnt(a ^ b); }
 #else
-// to calculate metric for census transform
-int HammingDistance(const int& a, const int& b) {
-	int d = a ^ b;
-	int res = 0;
-	while (d > 0) {
-		res += d & 1;
-		d >>= 1;
-	}
-	return res;
-}
+    // portable implementation
+    int HammingDistance(const int& a, const int& b) {
+        int d = a ^ b;
+        int res = 0;
+        while (d > 0) {
+            res += d & 1;
+            d >>= 1;
+        }
+        return res;
+    }
 #endif
+#ifdef _WIN32
+    #include <ppl.h>
+#endif
+
+
 
 
 
@@ -163,7 +168,7 @@ Mat Stereo::stereo_match(Mat left, Mat right) {
 	return imgDisparity8U;
 }
 
-
+#if defined(_WIN32) || defined(_WIN64)
 //vc++ concurrency implementation of parallel execution, but slower than openMP, not good for census
 //
 Mat Stereo::stereo_match_parallel(Mat left, Mat right) {
@@ -211,7 +216,7 @@ Mat Stereo::stereo_match_parallel(Mat left, Mat right) {
 	//imwrite("dis.png", imgDisparity8U);
 	return imgDisparity8U;
 }
-
+#endif
 
 
 int main(int argc, char** argv)
@@ -238,12 +243,16 @@ int main(int argc, char** argv)
 	}
 	else {
 		Stereo s(window_size, max_disparity, tranwin_size, cost, true);
+		#if defined(_WIN32) || defined(_WIN64)
 		if (windows == "yes") {
 			dis = s.stereo_match_parallel(left, right);
 		}
 		else {
 			dis = s.stereo_match(left, right);
 		}
+		#else
+		dis = s.stereo_match(left, right);
+		#endif		
 	}
 
 
