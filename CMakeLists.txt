@@ -15,8 +15,14 @@ set(SOURCES
     stereo_matching.cpp
 )
 
-# Enable Qt's automoc for signals/slots
-set(CMAKE_AUTOMOC ON)
+include(CheckCXXCompilerFlag)
+
+check_cxx_compiler_flag("-mpopcnt" COMPILER_HAS_POPCNT)
+if(COMPILER_HAS_POPCNT)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp")
 
 # Add executable
 add_executable(${PROJECT_NAME} ${SOURCES})

@@ -7,21 +7,23 @@
     #include <intrin.h>
     static inline int HammingDistance(int a, int b) { return __popcnt(a ^ b); }
 #else
-    // portable implementation
-    int HammingDistance(const int& a, const int& b) {
-        int d = a ^ b;
-        int res = 0;
-        while (d > 0) {
-            res += d & 1;
-            d >>= 1;
+#if defined(__GNUG__)
+    #if defined(__POPCNT__)
+        inline int HammingDistance(int a, int b) {
+            return __builtin_popcount(a ^ b);
         }
-        return res;
-    }
+    #else
+        inline int HammingDistance(int a, int b) {
+            int d = a ^ b, res = 0;
+            while (d > 0) { res += d & 1; d >>= 1; }
+            return res;
+        }
+    #endif
+#endif
 #endif
 #ifdef _WIN32
     #include <ppl.h>
 #endif
-
 
 
 
