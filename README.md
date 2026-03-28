@@ -1,6 +1,6 @@
 stereo matching 
 ==========
-Simple CPU implementation from scratch of Block Matching using simple Sum of Square difference, rank transform and census transform as matching cost. Defualt use OpenMP optimization (save about 200ms per image), also have the option to use Visual c++ (for windows user) concurrency module to parallel the code (slower than openMP in my case)   
+Simple CPU implementation from scratch of Block Matching using simple Sum of Square difference, rank transform or census transform followed by hamming distance as matching cost. Defualt version use OpenMP optimization (save about 200ms execution time per image), also have the option to use Visual c++ (for windows user) concurrency module to parallellize the code execution (but slower than openMP in my case)   
 You can either compile the code to executable with gcc or visual studio with Opencv installed. This have been tested in Windows 10 and ubuntu 20.04    
 
 left image:  
@@ -23,10 +23,10 @@ Clearly, choosing rank transform or census transform as matching cost make dispa
 
 **Compile**
 
-    bash ./build 
+    bash ./build.sh 
 
 **Usage**
-
+    cd build
     ./stereo_mathing -left=<left image> -right=<right image> -max-disparity=<disparity range> -window_size=<window size for block matching> -tranwin_size=<window size for transformation> -output=<output image file> -parallel=<if you want to run parallel version> -cost=<matching cost function ex: rank or census> -windows=<yes if you want to use concurrrency module>
 
 **Examples**

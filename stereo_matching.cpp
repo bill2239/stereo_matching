@@ -64,7 +64,7 @@ Mat Stereo::census_transform(Mat image, int windowsize) {
 
 			for (int v = -window_half; v < window_half + 1; ++v) {
 				for (int u = -window_half; u < window_half + 1; ++u) {
-					if (v != 0 && u != 0) { // skip the central pixel
+					if (v != 0 || u != 0) { // skip the central pixel
 						ssd <<= 1;
 						if (image.at<uchar>(y + v, x + u) > image.at<uchar>(y, x))  ssd = ssd + 1; // assign last digit to 1 if pixel is larger than central pixel in the windows else assign 0
 					}
